@@ -36,6 +36,7 @@ Opcoes:
   --questions            Apenas geracao de perguntas para o negocio
   --refinement           Apenas geracao do documento de refinamento tecnico
   --plan                 Apenas geracao do plano de implementacao
+  --tests                Gera testes funcionais (cenarios JSON + runner)
   --all                  Executa todas as etapas (equivalente a --refine)
 
   --config FILE          Arquivo de configuracao (default: refine-config.json)
@@ -93,6 +94,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --plan|-P)
             MODE="plan"
+            shift
+            ;;
+        --tests|-T)
+            MODE="tests"
             shift
             ;;
         --config|-c)
@@ -341,6 +346,23 @@ run_implementation_plan() {
 }
 
 # ============================================================
+# Pipeline: Generate Functional Tests
+# ============================================================
+
+run_functional_tests() {
+    log_section "Gerando Testes Funcionais"
+
+    python3 "$LIB_DIR/generate_functional_tests.py" "$TICKET_DIR"
+    if [[ -d "$TICKET_DIR/testes-funcionais/cenarios" ]]; then
+        local count
+        count=$(find "$TICKET_DIR/testes-funcionais/cenarios" -name "*.json" ! -name "_*" 2>/dev/null | wc -l)
+        log_ok "$count cenarios gerados em testes-funcionais/cenarios/"
+    else
+        log_warn "Nenhum cenario gerado"
+    fi
+}
+
+# ============================================================
 # Main
 # ============================================================
 
@@ -382,6 +404,9 @@ main() {
             ;;
         plan)
             run_implementation_plan
+            ;;
+        tests)
+            run_functional_tests
             ;;
         refine|*)
             run_jira_deep

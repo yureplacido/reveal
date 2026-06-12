@@ -828,30 +828,46 @@ def _build_openapi_spec(ticket_id, summary, date, api_base_url, api_tags, paths_
     return spec
 
 
-def _infer_request_dto(schemas_list, path):
-    """Tenta inferir qual DTO usar como request body."""
+def _infer_dto_by_path(schemas_list, path, suffixes):
+    """Infere um schema DTO a partir do path.
+
+    Prioriza: 1) nome comeca pela entidade do path (case-insensitive),
+    2) nome compartilha tokens significativos do path,
+    3) primeiro schema com o sufixo esperado.
+    """
     entity = _path_to_entity_name(path)
+    entity_lower = entity.lower() if entity else ''
     for s in schemas_list:
-        if entity and s['name'].startswith(entity):
-            if s['name'].endswith('Input') or s['name'].endswith('Request'):
+        if entity_lower and s['name'].lower().startswith(entity_lower):
+            if s['name'].endswith(suffixes):
                 return s['name']
+    tokens = [p.replace('-', '').lower() for p in path.split('/') if p and not p.startswith('{') and len(p) >= 4]
+    best = None
+    best_score = 0
     for s in schemas_list:
-        if s['name'].endswith('Input') or s['name'].endswith('Request'):
+        if not s['name'].endswith(suffixes):
+            continue
+        name_lower = s['name'].lower()
+        score = sum(1 for tok in tokens if tok in name_lower)
+        if score > best_score:
+            best_score = score
+            best = s['name']
+    if best:
+        return best
+    for s in schemas_list:
+        if s['name'].endswith(suffixes):
             return s['name']
     return None
+
+
+def _infer_request_dto(schemas_list, path):
+    """Tenta inferir qual DTO usar como request body."""
+    return _infer_dto_by_path(schemas_list, path, ('Input', 'Request'))
 
 
 def _infer_response_dto(schemas_list, path):
     """Tenta inferir qual DTO usar como resposta."""
-    entity = _path_to_entity_name(path)
-    for s in schemas_list:
-        if entity and s['name'].startswith(entity):
-            if s['name'].endswith('Output') or s['name'].endswith('Response'):
-                return s['name']
-    for s in schemas_list:
-        if s['name'].endswith('Output') or s['name'].endswith('Response'):
-            return s['name']
-    return None
+    return _infer_dto_by_path(schemas_list, path, ('Output', 'Response'))
 
 
 def _infer_filter_dto(schemas_list, path):

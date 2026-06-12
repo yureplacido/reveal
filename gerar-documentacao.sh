@@ -207,6 +207,21 @@ if [[ -f "$SCRIPT_DIR/lib/generate_openapi_spec.py" && -f "$TICKET_DIR/status-ta
 fi
 
 # ============================================================
+# 6.6. Geracao de testes funcionais (se aplicavel)
+# ============================================================
+if [[ -f "$SCRIPT_DIR/lib/generate_functional_tests.py" && -f "$TICKET_DIR/status-tasks.json" ]]; then
+    log_section "Gerando Testes Funcionais"
+    TESTS_OUTPUT=$(python3 "$SCRIPT_DIR/lib/generate_functional_tests.py" "$TICKET_DIR" 2>&1 || true)
+    echo "$TESTS_OUTPUT"
+    if [[ -d "$TICKET_DIR/testes-funcionais/cenarios" ]]; then
+        TEST_COUNT=$(find "$TICKET_DIR/testes-funcionais/cenarios" -name "*.json" ! -name "_*" 2>/dev/null | wc -l)
+        log_ok "$TEST_COUNT cenarios gerados em testes-funcionais/"
+    else
+        log_info "Ticket sem testes funcionais aplicaveis."
+    fi
+fi
+
+# ============================================================
 # 7. Atualizacao da Descricao no Jira (interativa)
 # ============================================================
 if [[ -f "$SCRIPT_DIR/lib/jira-update-description.sh" && -f "$TICKET_DIR/status-tasks.json" ]]; then
@@ -250,6 +265,10 @@ for f in jira-data.json jira-summary.md impact-report.json \
         echo "    ⬜ $f (nao gerado)"
     fi
 done
+if [[ -d "$TICKET_DIR/testes-funcionais/cenarios" ]]; then
+    TEST_COUNT=$(find "$TICKET_DIR/testes-funcionais/cenarios" -name "*.json" ! -name "_*" 2>/dev/null | wc -l)
+    echo "    ✅ testes-funcionais/ ($TEST_COUNT cenarios)"
+fi
 echo ""
 echo "  Novas funcionalidades disponiveis:"
 echo "    🎯 Granularidade inteligente — auto-detectarada baseada na complexidade"

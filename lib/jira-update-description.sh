@@ -221,7 +221,7 @@ if schemas:
 
         # Riscos
         local risks
-        risks=$(awk '/## 7\. Riscos|## Riscos/,/^---/' "$REF_FILE" 2>/dev/null | grep -v '^---' | head -20 || echo "")
+        risks=$(awk '/## 7\. Riscos|## Riscos/,/^---/' "$REF_FILE" 2>/dev/null | grep -v '^---' | sed '1d' | head -20 || echo "")
         if [[ -n "$risks" ]]; then
             md+="## Riscos\n\n"
             md+="$risks\n\n"

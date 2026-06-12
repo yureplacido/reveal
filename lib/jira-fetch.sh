@@ -152,11 +152,11 @@ jira_deep_fetch() {
     linked_issues=$(echo "$basic_data" | jq -c '[.fields.issuelinks[]? | {
         id: .id,
         type: (.type.name // .type.outwardName // "relates"),
-        inward: .inwardIssue.key // null,
-        outward: .outwardIssue.key // null,
+        inward: (.inwardIssue.key? // null),
+        outward: (.outwardIssue.key? // null),
         direction: (if .inwardIssue then "inward" else "outward" end),
-        summary: (.inwardIssue.fields.summary // .outwardIssue.fields.summary // null),
-        status: (.inwardIssue.fields.status.name // .outwardIssue.fields.status.name // null)
+        summary: (.inwardIssue.fields.summary? // .outwardIssue.fields.summary? // null),
+        status: (.inwardIssue.fields.status.name? // .outwardIssue.fields.status.name? // null)
     }]')
     local link_count
     link_count=$(echo "$linked_issues" | jq 'length')
@@ -169,8 +169,8 @@ jira_deep_fetch() {
         key: .key,
         summary: .fields.summary,
         status: .fields.status.name,
-        assignee: .fields.assignee.displayName // null,
-        priority: .fields.priority.name // null
+        assignee: (.fields.assignee.displayName? // null),
+        priority: (.fields.priority.name? // null)
     }]')
     local sub_count
     sub_count=$(echo "$subtasks" | jq 'length')
@@ -242,7 +242,7 @@ with open('$tmp_dir/subtasks_enhanced.json', 'w') as f:
     if echo "$comments" | jq -e '. | length > 0' > /dev/null 2>&1; then
         comments=$(echo "$comments" | jq -c '[.[] | {
             id: .id,
-            author: .author.displayName // "unknown",
+            author: (.author.displayName // "unknown"),
             body: (.body | if type == "object" then [.. | objects | select(.type == "text") | .text] | join("\n") else . end),
             created: .created,
             updated: .updated
@@ -256,7 +256,7 @@ with open('$tmp_dir/subtasks_enhanced.json', 'w') as f:
     local changelog="[]"
     changelog=$(echo "$basic_data" | jq -c '[.changelog.histories[]? | {
         id: .id,
-        author: .author.displayName // "unknown",
+        author: (.author.displayName? // "unknown"),
         created: .created,
         items: [.items[]? | {
             field: .field,
@@ -276,7 +276,7 @@ with open('$tmp_dir/subtasks_enhanced.json', 'w') as f:
         filename: .filename,
         mimeType: .mimeType,
         size: .size,
-        author: .author.displayName // "unknown",
+        author: (.author.displayName? // "unknown"),
         created: .created,
         contentUrl: .content
     }]')

@@ -1,0 +1,44 @@
+# Resposta aos Comentarios — TICKET_ID
+
+## Contexto
+
+[O que o tech lead comentou no MR/PR, em quais arquivos, e o escopo da mudanca que gerou a duvida. Explicar o estado anterior e o objetivo da mudanca.]
+
+---
+
+## Versao para copiar no MR
+
+```
+[Sua resposta do traducao livre, para colar como comentario no MR/PR. Linguagem natural, sem backticks nem blocos de codigo, reconhecendo o ponto do tech lead e oferecendo alternativa no final.]
+```
+
+---
+
+## Comentario 1: "[frase do comentario do tech lead]"
+
+[A justificativa. Regras:
+- Explicar a intencao da mudanca e o problema que ela resolve
+- Sempre citar evidencia concreta: trecho de codigo real, diff/commit, padrao existente no projeto
+- Se o tech lead estiver certo em parte, reconhecer o ponto valido antes de divergir
+- Oferecer alternativa caso queira que o codigo siga outro formato]
+```
+
+[Trecho de codigo ou diff quando fizer sentido]
+
+---
+
+## Comentario 2: "[frase do comentario do tech lead]"
+
+[A justificativa.]
+
+---
+
+## Resumo
+
+| # | Comentario | Decisao | Arquivos Envolvidos |
+|---|------------|---------|---------------------|
+| 1 | ... | Manter / Alterar / Investigar | Arquivo.java |
+| 2 | ... | Manter / Alterar / Investigar | Arquivo.java |
+
+---
+*Documento de resposta gerado em YYYY-MM-DD*

@@ -59,6 +59,7 @@ reveal/
 │
 └── tickets/                      ← Documentação de tickets (criada pelo refine)
     ├── _template/                ← Modelo para novos tickets
+    │   └── resposta-tech-lead.md.example ← Template de resposta a comentarios do tech lead
     └── INDEX.md                  ← Índice gerado
 
 # Projetos de código fonte (fora deste repo):
@@ -1448,3 +1449,46 @@ cat input.md | python3 lib/humanize_text.py --pr
 - PR comments devem ser escritos em linguagem natural, sem `##`, `---`, ou tabelas
 - O agente não precisa se preocupar com a formatação técnica — o `humanize_text.py` lida com isso
 - Para dry-run do Jira, o preview mostra o markdown já humanizado (o que de fato será enviado)
+
+---
+
+## 22. Resposta a Comentários do Tech Lead
+
+### 22.1. Quando usar
+
+Quando um tech lead comenta em PR/MR (ou diretamente no ticket) questionando uma
+decisão de implementação — por exemplo, "reverter esse mapper", "manter a lógica
+na service como estava" — e a implementação precisa ser justificada
+tecnicamente. O documento registra a resposta de forma objetiva e diplomática,
+para que o dev possa repassar ao tech lead e dar sequência à discussão.
+
+### 22.2. Onde fica
+
+`tickets/TICKET_ID/resposta-tech-lead.md`
+
+O template está em `tickets/_template/resposta-tech-lead.md.example`.
+
+### 22.3. Formato
+
+Formato **narrativo** (não tabela de perguntas/respostas como no
+perguntas-negocio.md):
+
+- `# Resposta aos Comentarios — TICKET_ID`
+- `## Contexto` — resumo do que o tech lead comentou, em quais arquivos, e o escopo da mudança
+- Seções `## Comentario N: "[frase do tech lead]"` — uma por comentário
+- Tabela `## Resumo` — `# | Comentario | Decisao | Arquivos Envolvidos`
+- Rodapé com data de geração
+
+### 22.4. Regras para escrever as justificativas
+
+1. **Explicar a intenção** da mudança e o problema que ela resolve (ex.: eliminar duplicação de ~300 linhas entre Delegate e Service).
+2. **Citar evidência concreta**: trecho de código real, diff/commit (ex.: refs `913569f27`), padrão já existente no projeto, métricas de teste.
+3. **Reconhecer o ponto válido** do tech lead antes de divergir — nunca confrontar.
+4. **Oferecer alternativa** se o tech lead ainda quiser outro formato (ex.: mover a lógica para um método privado da Service), deixando claro o trade-off (retorno da duplicação, mistura de conversão de domínio com negócio).
+
+### 22.5. Uso
+
+O `resposta-tech-lead.md` **não é gerado automaticamente** pelo pipeline. É
+criado manualmente quando surge um comentário do tech lead. Não requer
+validação no `validate-ticket.sh` (é documento auxiliar), mas deve estar
+alinhado com o estado real do código citado.

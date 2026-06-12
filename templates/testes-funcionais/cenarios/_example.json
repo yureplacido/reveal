@@ -1,0 +1,69 @@
+{
+  "nome": "Exemplo - GET /api/recurso",
+  "tipo": "api",
+  "fonte": "openapi.yaml",
+  "variables": {},
+  "steps": [
+    {
+      "name": "Buscar recurso com ID valido",
+      "request": {
+        "method": "GET",
+        "path": "/api/recurso/1"
+      },
+      "assert": {
+        "status": 200,
+        "jsonpath": {
+          "$.id": 1
+        }
+      }
+    },
+    {
+      "name": "Buscar recurso inexistente",
+      "request": {
+        "method": "GET",
+        "path": "/api/recurso/99999"
+      },
+      "assert": {
+        "status": 404
+      }
+    },
+    {
+      "name": "Criar recurso",
+      "request": {
+        "method": "POST",
+        "path": "/api/recurso",
+        "body": {
+          "nome": "Teste",
+          "descricao": "Recurso de teste"
+        }
+      },
+      "extract": {
+        "novoId": "$.id"
+      },
+      "assert": {
+        "status": 201,
+        "jsonpath": {
+          "$.nome": "Teste"
+        }
+      }
+    },
+    {
+      "name": "Verificar recurso criado (poll)",
+      "request": {
+        "method": "GET",
+        "path": "/api/recurso/{{novoId}}"
+      },
+      "poll": {
+        "maxAttempts": 5,
+        "intervalSeconds": 1
+      },
+      "assert": {
+        "status": 200,
+        "jsonpath": {
+          "$.nome": "Teste",
+          "$.descricao": "Recurso de teste"
+        }
+      }
+    }
+  ]
+}
