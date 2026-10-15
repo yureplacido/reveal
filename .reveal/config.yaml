@@ -1,0 +1,45 @@
+version: 2
+
+reveal:
+  default_agent: opencode
+
+agents:
+  analysis: opencode
+  planning: opencode
+  execution: opencode
+  review: opencode
+
+providers:
+  opencode:
+    command: ""
+    timeout_seconds: 1800
+
+validation:
+  command: ""
+  timeout_seconds: 1800
+
+defaults:
+  permissions:
+    jira:
+      read: true
+      write: false
+    target_repository:
+      read: true
+      write: false
+    reveal_workspace:
+      read: true
+      write: true
+
+  guards:
+    scope: strict
+    repository: strict
+    knowledge: strict
+    evidence: required
+
+knowledge:
+  auto_update: false
+  require_guard: true
+
+workspace:
+  current_state: .reveal/current.yaml
+  history: .reveal/history.jsonl
